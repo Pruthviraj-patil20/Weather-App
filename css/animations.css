@@ -1,0 +1,227 @@
+/* ─────────────────────────────────────────────────────────────
+   SKYCAST — animations.css
+   Dynamic weather scenes, ambient effects and micro-interactions.
+   All weather animations honour prefers-reduced-motion.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Weather scene layer ─────────────────────────────────── */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transition: background var(--t-slow);
+}
+
+.scene.is-clear-day {
+  background:
+    radial-gradient(60% 60% at 80% 10%, rgba(96, 165, 250, 0.18), transparent 70%),
+    radial-gradient(50% 50% at 15% 90%, rgba(59, 130, 246, 0.1), transparent 70%),
+    var(--bg-primary);
+}
+
+.scene.is-clear-night {
+  background:
+    radial-gradient(50% 50% at 80% 8%, rgba(147, 197, 253, 0.1), transparent 70%),
+    radial-gradient(40% 40% at 12% 20%, rgba(99, 102, 241, 0.12), transparent 70%),
+    var(--bg-primary);
+}
+
+.scene.is-cloudy {
+  background:
+    radial-gradient(70% 60% at 50% 0%, rgba(148, 163, 184, 0.14), transparent 70%),
+    var(--bg-primary);
+}
+
+.scene.is-rain {
+  background:
+    radial-gradient(80% 70% at 50% 110%, rgba(30, 58, 138, 0.28), transparent 70%),
+    var(--bg-primary);
+}
+
+.scene.is-storm {
+  background:
+    radial-gradient(90% 80% at 50% 120%, rgba(30, 27, 75, 0.5), transparent 75%),
+    var(--bg-primary);
+}
+
+.scene.is-snow {
+  background:
+    radial-gradient(70% 60% at 50% 0%, rgba(125, 211, 252, 0.16), transparent 70%),
+    var(--bg-primary);
+}
+
+.scene.is-mist {
+  background:
+    linear-gradient(180deg, rgba(148, 163, 184, 0.12), transparent 60%),
+    var(--bg-primary);
+}
+
+/* ── Soft ambient glow for clear weather ─────────────────── */
+.scene .glow {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  top: -160px;
+  right: -120px;
+  background: radial-gradient(circle, rgba(255, 200, 120, 0.14), transparent 65%);
+  animation: glow-pulse 8s ease-in-out infinite;
+}
+
+[data-theme="dark"] .scene .glow {
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.12), transparent 65%);
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* ── Clouds ──────────────────────────────────────────────── */
+.scene .cloud {
+  position: absolute;
+  width: 220px;
+  height: 70px;
+  opacity: 0.12;
+}
+
+.scene .cloud::before,
+.scene .cloud::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.scene .cloud::before {
+  width: 120px;
+  height: 120px;
+  top: -60px;
+  left: 20px;
+}
+
+.scene .cloud::after {
+  width: 160px;
+  height: 160px;
+  top: -90px;
+  right: 10px;
+}
+
+.scene .cloud.c1 { top: 18%; left: -240px; animation: cloud-drift 60s linear infinite; }
+.scene .cloud.c2 { top: 32%; left: -320px; animation: cloud-drift 88s linear infinite 8s; opacity: 0.08; }
+
+@keyframes cloud-drift {
+  to { transform: translateX(calc(100vw + 480px)); }
+}
+
+/* ── Rain ────────────────────────────────────────────────── */
+.scene .raindrops {
+  position: absolute;
+  inset: 0;
+}
+
+.scene .raindrop {
+  position: absolute;
+  width: 1.5px;
+  height: 42px;
+  background: linear-gradient(180deg, transparent, rgba(147, 197, 253, 0.55));
+  border-radius: var(--radius-pill);
+  top: -60px;
+}
+
+@keyframes rain-fall {
+  to { transform: translateY(110vh) translateX(-28px); }
+}
+
+/* ── Snow ────────────────────────────────────────────────── */
+.scene .snowflakes {
+  position: absolute;
+  inset: 0;
+}
+
+.scene .snowflake {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  top: -12px;
+}
+
+@keyframes snow-fall {
+  to { transform: translateY(108vh) translateX(var(--sway, 24px)); }
+}
+
+/* ── Lightning (storm) ───────────────────────────────────── */
+.scene .lightning {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse at 70% 20%, rgba(255, 255, 255, 0.16), transparent 60%);
+  animation: lightning-flash 9s infinite;
+}
+
+@keyframes lightning-flash {
+  0%, 88%, 100% { opacity: 0; }
+  89% { opacity: 0.9; }
+  90% { opacity: 0.1; }
+  91% { opacity: 0.7; }
+  92% { opacity: 0; }
+}
+
+/* ── Favourite heart ─────────────────────────────────────── */
+.heart-btn svg {
+  transition: transform var(--t-fast), color var(--t-fast);
+}
+
+.heart-btn.is-faved svg {
+  fill: var(--danger);
+  color: var(--danger);
+}
+
+.heart-btn.is-faved.anim svg {
+  animation: heart-pop 420ms cubic-bezier(0.3, 1.6, 0.4, 1);
+}
+
+@keyframes heart-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.45) rotate(-8deg); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* ── Hover micro-interactions ────────────────────────────── */
+.hourly-cell:hover {
+  background: var(--surface-hover);
+  transform: translateY(-2px);
+}
+
+.weather-row:hover {
+  background: var(--surface-hover);
+}
+
+/* ── Sun path dash animation ─────────────────────────────── */
+.sun-arc {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 0;
+  animation: draw-arc 1.6s var(--t-slow) both;
+}
+
+@keyframes draw-arc {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── Reduced motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

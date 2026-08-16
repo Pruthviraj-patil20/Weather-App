@@ -1,0 +1,17 @@
+# ── Secrets ──────────────────────────────────────────────────
+.env
+js/config.local.js
+
+# ── OS / editor noise ───────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# ── Logs & build output ─────────────────────────────────────
+npm-debug.log*
+yarn-error.log*
+*.log
+dist/
+build/

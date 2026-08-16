@@ -1,0 +1,194 @@
+/* ─────────────────────────────────────────────────────────────
+   SKYCAST — search.css
+   Search page: big search, recent searches, favorites, results.
+   ───────────────────────────────────────────────────────────── */
+
+.search-page {
+  max-width: 860px;
+}
+
+.hero-search {
+  position: relative;
+  margin-bottom: var(--space-7);
+}
+
+.hero-search .input {
+  height: 56px;
+  font-size: var(--fs-md);
+  border-radius: var(--radius-lg);
+  padding-left: calc(var(--space-5) + 30px);
+  padding-right: calc(var(--space-5) + 48px);
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-search .search-icon {
+  left: var(--space-5);
+  width: 22px;
+  height: 22px;
+}
+
+.hero-search .clear-search {
+  width: 34px;
+  height: 34px;
+}
+
+.hero-search .suggestions {
+  top: calc(100% + 8px);
+  border-radius: var(--radius-lg);
+}
+
+.search-section {
+  margin-bottom: var(--space-7);
+}
+
+.search-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.search-section-title h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+}
+
+.search-section-title .text-action {
+  background: none;
+  color: var(--accent);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.search-section-title .text-action:hover {
+  background: var(--accent-soft);
+}
+
+/* ── Recent searches ─────────────────────────────────────── */
+.recent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.recent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  transition: all var(--t-fast);
+}
+
+.recent-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.recent-chip svg { width: 14px; height: 14px; }
+
+/* ── Search results ──────────────────────────────────────── */
+.search-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.result-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
+}
+
+.result-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.result-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.result-city {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+}
+
+.result-region {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+.result-icon { width: 44px; height: 44px; }
+
+.result-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-temp {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+}
+
+.result-cond { font-size: var(--fs-sm); color: var(--text-secondary); }
+
+.result-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ── Quick favourite cities ──────────────────────────────── */
+.quick-fav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  transition: all var(--t-fast);
+}
+
+.quick-fav-chip:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.quick-fav-chip svg {
+  width: 15px;
+  height: 15px;
+  color: var(--danger);
+}
+
+.quick-fav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

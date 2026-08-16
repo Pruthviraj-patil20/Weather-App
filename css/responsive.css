@@ -1,0 +1,107 @@
+/* ─────────────────────────────────────────────────────────────
+   SKYCAST — responsive.css
+   Cross-page responsive tuning. Layout shell breakpoints live
+   in layout.css; this file covers grids, type and components.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Tablet (768px – 1023px) ─────────────────────────────── */
+@media (max-width: 1023px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .favorites-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Mobile (320px – 767px) ──────────────────────────────── */
+@media (max-width: 767px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  .stat-card {
+    padding: var(--space-3);
+    flex-direction: column;
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .forecast-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .segmented {
+    width: 100%;
+  }
+
+  .segmented button {
+    flex: 1;
+  }
+
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-legend {
+    flex-wrap: wrap;
+  }
+
+  .hero-weather {
+    padding: var(--space-6);
+  }
+
+  .hero-temp {
+    font-size: clamp(4rem, 24vw, 6rem);
+  }
+
+  .page {
+    padding-top: var(--space-5);
+  }
+}
+
+/* ── Tiny screens ────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .search-results-grid,
+  .recent-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Touch-friendly hit areas on coarse pointers ─────────── */
+@media (pointer: coarse) {
+  .nav-link,
+  .mobile-nav-item,
+  .icon-button,
+  .btn {
+    min-height: 44px;
+  }
+}
+
+/* ── Landscape phones ────────────────────────────────────── */
+@media (max-height: 520px) and (orientation: landscape) {
+  .sidebar {
+    padding-top: var(--space-4);
+  }
+  .sidebar-brand {
+    margin-bottom: var(--space-4);
+  }
+}

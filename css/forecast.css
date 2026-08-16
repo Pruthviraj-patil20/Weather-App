@@ -1,0 +1,247 @@
+/* ─────────────────────────────────────────────────────────────
+   SKYCAST — forecast.css
+   Forecast page: tabs, 24h/daily lists and detail charts.
+   ───────────────────────────────────────────────────────────── */
+
+.forecast-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.forecast-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.forecast-layout .stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.forecast-tab-panel {
+  display: none;
+}
+
+.forecast-tab-panel.is-active {
+  display: block;
+  animation: page-in var(--t-med) both;
+}
+
+/* ── Hourly 24h grid ─────────────────────────────────────── */
+.hourly-24 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: var(--space-3);
+}
+
+.hour24-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  transition: border-color var(--t-fast), transform var(--t-fast);
+}
+
+.hour24-cell:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.hour24-cell .h24-time {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.hour24-cell .h24-icon { width: 32px; height: 32px; }
+
+.hour24-cell .h24-temp {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+}
+
+.hour24-cell .h24-rain {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+.hour24-cell .h24-rain svg { width: 11px; height: 11px; }
+
+.hour24-cell.is-now {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.hour24-cell.is-now .h24-time { color: var(--accent); }
+
+/* ── Daily rows (extended) ───────────────────────────────── */
+.daily-card-row {
+  display: grid;
+  grid-template-columns: 1fr 44px 1.4fr 1fr 120px;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-2);
+}
+
+.daily-card-row + .daily-card-row {
+  border-top: 1px solid var(--border);
+}
+
+.daily-card-row .dc-day {
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-base);
+}
+.daily-card-row .dc-date {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+
+.daily-card-row .dc-icon { width: 34px; height: 34px; }
+
+.daily-card-row .dc-cond { font-size: var(--fs-sm); color: var(--text-secondary); }
+
+.daily-card-row .dc-rain {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+}
+.daily-card-row .dc-rain svg { width: 12px; height: 12px; }
+
+.daily-card-row .dc-temps {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+.daily-card-row .dc-high { font-weight: var(--fw-semibold); }
+.daily-card-row .dc-low { color: var(--text-tertiary); }
+
+/* ── Details breakdown ───────────────────────────────────── */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.detail-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.detail-stat .ds-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.detail-stat .ds-icon svg { width: 20px; height: 20px; }
+
+.detail-stat .ds-label {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  font-weight: var(--fw-semibold);
+}
+
+.detail-stat .ds-value {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+}
+
+.detail-stat .ds-note {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+/* ── Condition breakdown bar ─────────────────────────────── */
+.cond-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cond-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 60px;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--fs-sm);
+}
+
+.cond-row .cond-name {
+  color: var(--text-secondary);
+}
+
+.cond-row .cond-track {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+  overflow: hidden;
+}
+
+.cond-row .cond-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  transition: width var(--t-slow);
+}
+
+.cond-row .cond-count {
+  text-align: right;
+  font-weight: var(--fw-semibold);
+  font-family: var(--font-display);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .forecast-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-card-row {
+    grid-template-columns: 1fr 44px 1fr 120px;
+  }
+
+  .daily-card-row .dc-cond {
+    display: none;
+  }
+
+  .cond-row {
+    grid-template-columns: 110px 1fr 52px;
+  }
+}

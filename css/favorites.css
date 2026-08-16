@@ -1,0 +1,119 @@
+/* ─────────────────────────────────────────────────────────────
+   SKYCAST — favorites.css
+   Favorites page: location cards grid.
+   ───────────────────────────────────────────────────────────── */
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+}
+
+.fav-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
+}
+
+.fav-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-strong);
+}
+
+.fav-card .fav-accent {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+
+.fav-card:hover .fav-accent,
+.fav-card:focus-visible .fav-accent {
+  opacity: 1;
+}
+
+.fav-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.fav-city {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+}
+
+.fav-country {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+.fav-card-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.fav-temp {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-tight);
+}
+
+.fav-icon {
+  width: 52px;
+  height: 52px;
+}
+
+.fav-cond {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.fav-highlow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.fav-highlow .fav-low {
+  color: var(--text-tertiary);
+}
+
+.fav-card .heart-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+}
+.fav-card .heart-btn svg { width: 18px; height: 18px; }
+
+/* ── Loading skeleton variants ───────────────────────────── */
+.fav-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
