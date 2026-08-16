@@ -492,6 +492,7 @@ function renderSettings() {
 
   $("#wind-speed-select").value = s.windSpeed || "auto";
   $("#time-format-select").value = s.timeFormat || "12h";
+  $("#geolocation-toggle").checked = s.useGeolocation !== false;
   $("#api-key-input").value = AppConfig.apiKey() || "";
 }
 
@@ -533,6 +534,11 @@ function bindEvents() {
     if (state.data) renderCurrent();
   });
 
+  $("#geolocation-toggle").addEventListener("change", (e) => {
+    Storage.saveSettings({ useGeolocation: e.target.checked });
+    document.dispatchEvent(new CustomEvent("skycast:settings"));
+  });
+
   $("#search-input").addEventListener("input", handleSearchInput);
   $("#search-input").addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
@@ -553,6 +559,10 @@ function bindEvents() {
   });
 
   $("#location-btn").addEventListener("click", () => {
+    Location.fromBrowser().then(loadPlace).catch(() => showError("Location unavailable."));
+  });
+
+  $("#dashboard-location-btn").addEventListener("click", () => {
     Location.fromBrowser().then(loadPlace).catch(() => showError("Location unavailable."));
   });
 
