@@ -53,7 +53,7 @@ SKYCAST uses the [OpenWeatherMap API](https://openweathermap.org/api). You'll ne
    - **Local Config** — Create `js/config.local.js`:
      ```javascript
      window.SKYCAST_CONFIG = {
-       apiKey: 'YOUR_API_KEY_HERE'
+       apiKey: 'e0a1d6fbd4e89ce3e203518d29b16d88'
      };
      ```
 
