@@ -56,6 +56,10 @@
   --uv-very-high: #ef4444;
   --uv-extreme: #a855f7;
 
+  /* ── Light rainbow background ──────────────────────────── */
+  --bg-rainbow-start: #fcd34d;
+  --bg-rainbow-end: #fbbf24;
+
   /* ── Typography ────────────────────────────────────────── */
   --font-family: "Inter", "Manrope", -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -127,6 +131,22 @@
   color-scheme: light;
 }
 
+/* ── Keyframes ─────────────────────────────────────────────── */
+@keyframes bg-rainbow {
+  0%, 100% { background: linear-gradient(135deg, var(--bg-rainbow-start), var(--bg-rainbow-end)); }
+  50% { background: linear-gradient(135deg, var(--bg-rainbow-end), var(--bg-rainbow-start)); }
+}
+
+@keyframes bg-rainbow-slow {
+  0%, 100% { background: linear-gradient(135deg, var(--bg-rainbow-start), var(--bg-rainbow-end)); }
+  50% { background: linear-gradient(135deg, #f87171, #fbbf24); }
+}
+
+@keyframes bg-rainbow-dark {
+  0%, 100% { background: linear-gradient(135deg, var(--bg-rainbow-start), var(--bg-rainbow-end)); }
+  50% { background: linear-gradient(135deg, #7f1d1d, #f97316); }
+}
+
 /* ── Dark theme ──────────────────────────────────────────── */
 [data-theme="dark"] {
   --bg-primary: #070b14;
@@ -170,9 +190,28 @@
   --shadow-lg: 0 14px 40px rgba(0, 0, 0, 0.55);
 
   color-scheme: dark;
+
+  /* ── Dark rainbow background ───────────────────────────── */
+  --bg-rainbow-start: #f97316;
+  --bg-rainbow-end: #ec4899;
 }
 
-/* ── Fonts — loaded once; Inter is primary, Manrope for display ── */
+/* ── Rainbow theme ───────────────────────────────────────── */
+[data-theme="rainbow"] {
+  animation: bg-rainbow 8s ease infinite;
+  --bg-primary: transparent;
+  --bg-secondary: transparent;
+}
+
+/* ── Light rainbow solid background ──────────────────────── */
+[data-theme="rainbow-light"] {
+  background: linear-gradient(135deg, var(--bg-rainbow-start), var(--bg-rainbow-end));
+  --bg-primary: var(--bg-rainbow-start);
+  --bg-secondary: var(--bg-rainbow-end);
+  transition: background 3s ease;
+}
+
+/* ── Fonts ── */
 @media (min-width: 768px) {
   :root {
     --fs-hero: clamp(4rem, 9vw, 6.25rem);

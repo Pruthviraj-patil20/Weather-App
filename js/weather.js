@@ -239,12 +239,14 @@ function conditionLabel(id, fallback) {
 }
 
 /* ── Main fetch orchestration ─────────────────────────────── */
-async function fetchAll(lat, lon) {
+async function fetchAll(lat, lon, force = false) {
   refreshSettings();
 
   const cacheKey = `${lat.toFixed(2)},${lon.toFixed(2)}`;
-  const cached = Storage.getCache(cacheKey);
-  if (cached) return cached;
+  if (!force) {
+    const cached = Storage.getCache(cacheKey);
+    if (cached) return cached;
+  }
 
   const current = await getCurrentWeather(lat, lon);
 

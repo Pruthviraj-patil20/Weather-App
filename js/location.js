@@ -29,33 +29,47 @@ const Location = {
   },
 
   /** Ask the browser for coordinates. Rejects on deny/error. */
-  fromBrowser() {
+  fromBrowser(forceFresh = false) {
     return new Promise((resolve, reject) => {
       if (!("geolocation" in navigator)) {
-        reject(new Error("Geolocation not supported"));
+        reject(new Error("Geolocation not supported by your browser"));
         return;
       }
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const { latitude, longitude } = pos.coords;
-          let place = { name: "", lat: latitude, lon: longitude, key: `${latitude.toFixed(2)},${longitude.toFixed(2)}` };
-          try {
-            const named = await reverseGeocode(latitude, longitude);
-            if (named) place = { ...place, ...named };
-          } catch (err) {
-            /* reverse geocoding is best-effort; keep coords */
+
+      const requestPos = (highAccuracy) => {
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const { latitude, longitude } = pos.coords;
+            let place = { name: "", lat: latitude, lon: longitude, key: `${latitude.toFixed(2)},${longitude.toFixed(2)}` };
+            try {
+              const named = await reverseGeocode(latitude, longitude);
+              if (named) place = { ...place, ...named };
+            } catch (err) {
+              /* reverse geocoding is best-effort; keep coords */
+            }
+            Storage.saveLastLocation(place);
+            resolve(place);
+          },
+          (err) => {
+            if (highAccuracy && (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE)) {
+              // Retry with standard WiFi/IP accuracy
+              requestPos(false);
+              return;
+            }
+            let message = "Location permission denied. Please allow location access in your browser.";
+            if (err.code === err.POSITION_UNAVAILABLE) message = "Location unavailable. Please check your device location settings.";
+            if (err.code === err.TIMEOUT) message = "Location request timed out. Please try again.";
+            reject(new Error(message));
+          },
+          {
+            enableHighAccuracy: highAccuracy,
+            timeout: highAccuracy ? 5000 : 10000,
+            maximumAge: forceFresh ? 0 : 60000,
           }
-          Storage.saveLastLocation(place);
-          resolve(place);
-        },
-        (err) => {
-          let message = "Location permission denied.";
-          if (err.code === err.POSITION_UNAVAILABLE) message = "Location unavailable.";
-          if (err.code === err.TIMEOUT) message = "Location request timed out.";
-          reject(new Error(message));
-        },
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 }
-      );
+        );
+      };
+
+      requestPos(true);
     });
   },
 

@@ -81,7 +81,7 @@
         </button>
         <div class="sidebar-location">
           <svg class="loc-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span class="loc-name" id="location-name">--</span>
+          <span class="loc-name" id="sidebar-location-name">--</span>
         </div>
       </div>
     </aside>
@@ -113,10 +113,13 @@
         </div>
 
         <div class="header-actions">
-          <button id="location-btn" class="icon-button" aria-label="Use current location">
+          <button id="location-btn" class="icon-button" aria-label="Use current location" title="Use my location">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
           </button>
-          <button id="settings-btn" class="icon-button" aria-label="Settings" data-page="settings">
+          <button id="map-btn" class="icon-button" aria-label="Open in Maps" title="Open in Maps" style="color: var(--accent);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+          </button>
+          <button id="settings-btn" class="icon-button" aria-label="Settings" data-page="settings" title="Settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </button>
         </div>
@@ -128,7 +131,7 @@
           <div class="greeting-block">
             <div>
               <h2 id="greeting">Dashboard</h2>
-              <p id="greeting-sub">Live weather for <strong id="location-country">--</strong></p>
+              <p id="greeting-sub">Live weather for <strong id="greeting-location-name">--</strong></p>
             </div>
             <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
               <button id="dashboard-location-btn" class="btn btn-secondary btn-sm" aria-label="Use my current location">
@@ -137,7 +140,7 @@
               </button>
               <span class="location-pill">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                <span id="location-name">--</span>
+                <span id="pill-location-name">--</span>
               </span>
             </div>
           </div>
@@ -182,6 +185,10 @@
                     </span>
                   </div>
                   <div class="hero-updated" id="hero-updated-label">--</div>
+                <div class="hero-time-format" style="display:flex;gap:var(--space-2);font-size:var(--fs-sm);color:var(--text-tertiary);">
+                  <button class="time-option" data-time-format="12h">12h</button>
+                  <button class="time-option" data-time-format="24h">24h</button>
+                </div>
                 </div>
               </section>
 
@@ -377,6 +384,14 @@
                     <button class="theme-option system" data-theme-option="system">
                       <span class="to-preview"></span>
                       <span class="to-label">System</span>
+                    </button>
+                    <button class="theme-option rainbow" data-theme-rainbow="rainbow-light">
+                      <span class="to-preview"></span>
+                      <span class="to-label">Rainbow Light</span>
+                    </button>
+                    <button class="theme-option rainbow" data-theme-rainbow="rainbow">
+                      <span class="to-preview"></span>
+                      <span class="to-label">Rainbow Animated</span>
                     </button>
                   </div>
                 </div>

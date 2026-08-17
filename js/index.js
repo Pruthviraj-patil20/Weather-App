@@ -99,6 +99,8 @@ function renderLocations() {
   $$("[data-location]").forEach((node) => {
     node.innerHTML = `${pin}<span class="loc-text">${name}</span>`;
   });
+  if ($("#pill-location-name")) $("#pill-location-name").textContent = name;
+  if ($("#sidebar-location-name")) $("#sidebar-location-name").textContent = name;
 }
 
 function renderCurrent() {
@@ -112,10 +114,11 @@ function renderCurrent() {
 
   $("#hero-city-name").textContent = name;
   $("#hero-country").textContent = country || "—";
-  $("#location-name").textContent = name;
-  $("#location-country").textContent = country || name;
+  if ($("#sidebar-location-name")) $("#sidebar-location-name").textContent = name;
+  if ($("#pill-location-name")) $("#pill-location-name").textContent = name;
   $("#greeting").textContent = `Good ${dayGreeting()}`;
-  $("#greeting-sub").innerHTML = `Live weather for <strong id="location-country">${name}${country ? ", " + country : ""}</strong>`;
+  const greetingEl = $("#greeting-location-name") || $("#location-country");
+  if (greetingEl) greetingEl.textContent = `${name}${country ? ", " + country : ""}`;
   $("#temperature").textContent = toDisplayTemp(c.temp);
   $("#temp-unit").textContent = tempUnit();
   $("#weather-description").textContent = conditionLabel(c.weatherId, c.condition);
@@ -130,7 +133,16 @@ function renderCurrent() {
   $("#pressure").textContent = `${c.pressure} hPa`;
 
   const updated = new Date(data.fetchedAt);
-  $("#hero-updated").textContent = `Updated ${updated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  const s = Storage.getSettings();
+  const timeFormat = s.timeFormat || "12h";
+  if (timeFormat === "24h") {
+    $("#hero-updated").textContent = `Updated ${updated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  } else {
+    const h = updated.getHours();
+    const suffix = h >= 12 ? "PM" : "AM";
+    const hh = h % 12 === 0 ? 12 : h % 12;
+    $("#hero-updated").textContent = `Updated ${hh}:${updated.getMinutes().toString().padStart(2, "0")} ${suffix}`;
+  }
   $("#hero-updated-label").textContent = `Live · ${conditionLabel(c.weatherId, c.condition)}`;
 
   const fav = Storage.isFavorite(c.key);
@@ -409,14 +421,14 @@ function showError(message) {
 }
 
 /* ── Data loading ─────────────────────────────────────────── */
-async function loadPlace(place) {
+async function loadPlace(place, force = false) {
   if (!place || state.loading) return;
   state.place = place;
   state.data = null;
   setLoading(true);
 
   try {
-    const data = await fetchAll(place.lat, place.lon);
+    const data = await fetchAll(place.lat, place.lon, force);
     state.data = data;
     Storage.saveRecentSearch(place);
     Storage.saveLastLocation(place);
@@ -493,6 +505,7 @@ function showPage(name) {
   $("#page-title").textContent = PAGE_TITLES[name] || "SKYCAST";
   if (name === "favorites") renderFavorites();
   if (name === "settings") renderSettings();
+  if (name === "forecast") renderForecastPage();
 }
 
 /* ── Settings ─────────────────────────────────────────────── */
@@ -511,6 +524,9 @@ function renderSettings() {
 
   $("#wind-speed-select").value = s.windSpeed || "auto";
   $("#time-format-select").value = s.timeFormat || "12h";
+  $$(".hero-time-format .time-option").forEach((opt) => {
+    opt.classList.toggle("is-active", opt.dataset.timeFormat === (s.timeFormat || "12h"));
+  });
   $("#geolocation-toggle").checked = s.useGeolocation !== false;
   $("#api-key-input").value = AppConfig.apiKey() || "";
 }
@@ -525,6 +541,13 @@ function bindEvents() {
   $$("[data-theme-option]").forEach((btn) => {
     btn.addEventListener("click", () => {
       Theme.set(btn.dataset.themeOption);
+      renderSettings();
+    });
+  });
+
+  $$("[data-theme-rainbow]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      Theme.set(btn.dataset.themeRainbow);
       renderSettings();
     });
   });
@@ -553,9 +576,25 @@ function bindEvents() {
     if (state.data) renderCurrent();
   });
 
+  $$(".hero-time-format .time-option").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      Storage.saveSettings({ timeFormat: btn.dataset.timeFormat });
+      refreshSettings();
+      document.dispatchEvent(new CustomEvent("skycast:settings"));
+      if (state.data) renderCurrent();
+    });
+  });
+
   $("#geolocation-toggle").addEventListener("change", (e) => {
     Storage.saveSettings({ useGeolocation: e.target.checked });
     document.dispatchEvent(new CustomEvent("skycast:settings"));
+  });
+
+  $("#map-btn").addEventListener("click", () => {
+    if (!state.place) return;
+    const { lat, lon } = state.place;
+    const query = `${lat},${lon}`;
+    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
   });
 
   $("#search-input").addEventListener("input", handleSearchInput);
@@ -577,16 +616,36 @@ function bindEvents() {
     $(".search-bar").classList.remove("has-value");
   });
 
-  $("#location-btn").addEventListener("click", () => {
-    Location.fromBrowser().then(loadPlace).catch(() => showError("Location unavailable."));
+  const handleLocationClick = async (btn) => {
+    if (state.loading) return;
+    if (btn) {
+      btn.disabled = true;
+      btn.style.opacity = "0.7";
+    }
+    $("#weather-description").textContent = "Detecting your location…";
+    try {
+      const place = await Location.fromBrowser(true);
+      await loadPlace(place, true);
+    } catch (err) {
+      showError(err.message || "Location unavailable.");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = "";
+      }
+    }
+  };
+
+  $("#location-btn").addEventListener("click", (e) => {
+    handleLocationClick(e.currentTarget);
   });
 
   $("#settings-btn").addEventListener("click", () => {
     showPage("settings");
   });
 
-  $("#dashboard-location-btn").addEventListener("click", () => {
-    Location.fromBrowser().then(loadPlace).catch(() => showError("Location unavailable."));
+  $("#dashboard-location-btn").addEventListener("click", (e) => {
+    handleLocationClick(e.currentTarget);
   });
 
   $("#favorite-btn").addEventListener("click", () => {

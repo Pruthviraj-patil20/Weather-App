@@ -13,7 +13,7 @@ const Theme = {
 
   /** Resolve the actual theme for a stored preference. */
   resolve(pref) {
-    if (pref === "light" || pref === "dark") return pref;
+    if (pref === "light" || pref === "dark" || pref.startsWith("rainbow")) return pref;
     return media.matches ? "dark" : "light";
   },
 
@@ -45,6 +45,17 @@ const Theme = {
     });
 
     this.syncThemeOptions();
+
+    /* ── Rainbow theme background ────────────────────────── */
+    if (pref === "rainbow-light") {
+      document.body.style.background = `linear-gradient(135deg, var(--bg-rainbow-start), var(--bg-rainbow-end))`;
+    } else if (pref === "rainbow") {
+      document.body.style.animation = "bg-rainbow 8s ease infinite";
+      document.body.style.background = "transparent";
+    } else {
+      document.body.style.background = "";
+      document.body.style.animation = "";
+    }
   },
 
   /** Reflect active theme inside settings page. */
@@ -53,6 +64,10 @@ const Theme = {
     document.querySelectorAll("[data-theme-option]").forEach((opt) => {
       opt.classList.toggle("is-active", opt.dataset.themeOption === pref);
       opt.setAttribute("aria-pressed", opt.dataset.themeOption === pref ? "true" : "false");
+    });
+    const rainbowOpts = document.querySelectorAll("[data-theme-rainbow]");
+    rainbowOpts.forEach((opt) => {
+      opt.classList.toggle("is-active", pref.startsWith("rainbow"));
     });
   },
 
