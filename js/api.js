@@ -69,6 +69,11 @@ async function request(path, params = {}) {
 
 /* ── Public API surface ───────────────────────────────────── */
 
+/** OpenWeather Air Pollution returns an overall index on a 1–5 scale.
+    Map each band to a representative US-EPA AQI value so the UI can
+    render a meaningful number, category and gauge position. */
+const OWM_AQI_VALUE = { 1: 25, 2: 75, 3: 125, 4: 175, 5: 275 };
+
 /** Current weather for coordinates. */
 async function getCurrentWeather(lat, lon) {
   const data = await request("/data/2.5/weather", {
@@ -111,8 +116,10 @@ async function getAirQuality(lat, lon) {
   const data = await request("/data/2.5/air_pollution", { lat, lon });
   if (!data || !data.list || !data.list[0]) return null;
   const comp = data.list[0].components;
+  const owmIndex = data.list[0].main.aqi;
   return {
-    aqi: data.list[0].main.aqi,
+    aqi: OWM_AQI_VALUE[owmIndex] ?? owmIndex,
+    owmIndex,
     pm25: comp.pm2_5,
     pm10: comp.pm10,
     co: comp.co,

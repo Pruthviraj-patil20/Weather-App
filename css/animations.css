@@ -116,19 +116,111 @@
   to { transform: translateX(calc(100vw + 480px)); }
 }
 
-/* ── Rain ────────────────────────────────────────────────── */
-.scene .raindrops {
-  position: absolute;
+/* ── FX overlay (particles above content) ─────────────────── */
+.fx-overlay {
+  position: fixed;
   inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-.scene .raindrop {
+/* ── Sun rays (clear day) ─────────────────────────────────── */
+.fx-overlay .sun-rays {
+  position: absolute;
+  top: -25vmin;
+  right: -20vmin;
+  width: 75vmin;
+  height: 75vmin;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 1.4s ease, transform 1.4s ease;
+}
+.fx-overlay.fx-sun .sun-rays {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.fx-overlay .sun-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22%;
+  height: 22%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 230, 160, 0.95) 0%, rgba(255, 214, 110, 0.35) 55%, transparent 72%);
+  box-shadow: 0 0 70px 30px rgba(255, 200, 90, 0.35);
+  animation: sun-pulse 5s ease-in-out infinite;
+}
+
+.fx-overlay .rays {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 215, 130, 0.12) 0deg 10deg,
+    transparent 10deg 28deg
+  );
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0%, black 30%, transparent 72%);
+          mask-image: radial-gradient(circle at 50% 50%, transparent 0%, black 30%, transparent 72%);
+  animation: sun-spin 70s linear infinite;
+}
+
+@keyframes sun-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sun-pulse {
+  0%, 100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+/* ── Stars (clear night) ──────────────────────────────────── */
+.fx-overlay .stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.fx-overlay.fx-stars .stars { opacity: 1; }
+
+.fx-overlay .star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6);
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.7); }
+  50% { opacity: 0.9; transform: scale(1.15); }
+}
+
+/* ── Rain ────────────────────────────────────────────────── */
+.fx-overlay .raindrops {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+.fx-overlay.fx-rain .raindrops { opacity: 1; }
+
+.fx-overlay .raindrop {
   position: absolute;
   width: 1.5px;
   height: 42px;
   background: linear-gradient(180deg, transparent, rgba(147, 197, 253, 0.55));
   border-radius: var(--radius-pill);
   top: -60px;
+  animation: rain-fall 0.9s linear infinite;
+}
+
+.fx-overlay .raindrop.is-heavy {
+  width: 2px;
+  background: linear-gradient(180deg, transparent, rgba(191, 219, 254, 0.75));
 }
 
 @keyframes rain-fall {
@@ -136,30 +228,102 @@
 }
 
 /* ── Snow ────────────────────────────────────────────────── */
-.scene .snowflakes {
+.fx-overlay .snowflakes {
   position: absolute;
   inset: 0;
+  opacity: 0;
+  transition: opacity 1s ease;
 }
+.fx-overlay.fx-snow .snowflakes { opacity: 1; }
 
-.scene .snowflake {
+.fx-overlay .snowflake {
   position: absolute;
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.4);
   top: -12px;
+  animation: snow-fall 8s linear infinite;
 }
 
 @keyframes snow-fall {
   to { transform: translateY(108vh) translateX(var(--sway, 24px)); }
 }
 
+/* ── Fog / mist ──────────────────────────────────────────── */
+.fx-overlay .fog {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.fx-overlay.fx-fog .fog { opacity: 1; }
+
+.fx-overlay .fog-bank {
+  position: absolute;
+  left: -60%;
+  width: 220%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, transparent 0%, rgba(148, 163, 184, 0.4) 50%, transparent 100%);
+  filter: blur(30px);
+  animation: fog-drift 30s linear infinite;
+}
+
+@keyframes fog-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(35%); }
+}
+
+/* ── Extra clouds (cloudy) ───────────────────────────────── */
+.fx-overlay .cloud-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.fx-overlay.fx-clouds .cloud-layer { opacity: 1; }
+
+.fx-overlay .cloud-puff {
+  position: absolute;
+  left: -280px;
+  width: 280px;
+  height: 90px;
+  opacity: 0.5;
+  animation: cloud-drift 55s linear infinite;
+}
+
+.fx-overlay .cloud-puff::before,
+.fx-overlay .cloud-puff::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.fx-overlay .cloud-puff::before {
+  width: 150px;
+  height: 150px;
+  top: -75px;
+  left: 25px;
+}
+
+.fx-overlay .cloud-puff::after {
+  width: 200px;
+  height: 200px;
+  top: -115px;
+  right: 10px;
+}
+
 /* ── Lightning (storm) ───────────────────────────────────── */
-.scene .lightning {
+.fx-overlay .lightning {
   position: absolute;
   inset: 0;
   opacity: 0;
   background: radial-gradient(ellipse at 70% 20%, rgba(255, 255, 255, 0.16), transparent 60%);
+}
+
+.fx-overlay.fx-storm .lightning {
   animation: lightning-flash 9s infinite;
 }
 

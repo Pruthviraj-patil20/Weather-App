@@ -9,6 +9,7 @@ import { Storage } from "./storage.js";
 import { Theme } from "./theme.js";
 import { Location } from "./location.js";
 import { searchCity } from "./api.js";
+import { SceneEffects } from "./effects.js";
 import {
   fetchAll,
   refreshSettings,
@@ -74,6 +75,8 @@ function applyScene() {
   );
   scene.classList.add(`is-${sceneKey}`);
 
+  SceneEffects.render(sceneKey);
+
   if (hero) {
     hero.classList.remove("is-night", "is-rain", "is-storm", "is-snow", "is-cloudy");
     const map = { "clear-night": "is-night", rain: "is-rain", storm: "is-storm", snow: "is-snow", cloudy: "is-cloudy" };
@@ -82,6 +85,22 @@ function applyScene() {
 }
 
 /* ── Rendering ────────────────────────────────────────────── */
+function locationLabel() {
+  const c = state.data && state.data.current;
+  const place = state.place || {};
+  return c?.name || place?.name || "--";
+}
+
+/** Show the current place on every card so data is always
+    attributed to a location. */
+function renderLocations() {
+  const name = locationLabel();
+  const pin = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+  $$("[data-location]").forEach((node) => {
+    node.innerHTML = `${pin}<span class="loc-text">${name}</span>`;
+  });
+}
+
 function renderCurrent() {
   const { data } = state;
   if (!data) return;
@@ -96,7 +115,7 @@ function renderCurrent() {
   $("#location-name").textContent = name;
   $("#location-country").textContent = country || name;
   $("#greeting").textContent = `Good ${dayGreeting()}`;
-  $("#greeting-sub").innerHTML = `Live weather for <strong>${name}${country ? ", " + country : ""}</strong>`;
+  $("#greeting-sub").innerHTML = `Live weather for <strong id="location-country">${name}${country ? ", " + country : ""}</strong>`;
   $("#temperature").textContent = toDisplayTemp(c.temp);
   $("#temp-unit").textContent = tempUnit();
   $("#weather-description").textContent = conditionLabel(c.weatherId, c.condition);
@@ -119,6 +138,7 @@ function renderCurrent() {
   $("#favorite-btn").classList.toggle("is-faved", fav);
 
   applyScene();
+  renderLocations();
   renderAirQuality();
   renderUV();
   renderHourly();
@@ -471,7 +491,6 @@ function showPage(name) {
     link.classList.toggle("is-active", link.dataset.page === name);
   });
   $("#page-title").textContent = PAGE_TITLES[name] || "SKYCAST";
-  document.body.classList.remove("nav-open");
   if (name === "favorites") renderFavorites();
   if (name === "settings") renderSettings();
 }
@@ -562,6 +581,10 @@ function bindEvents() {
     Location.fromBrowser().then(loadPlace).catch(() => showError("Location unavailable."));
   });
 
+  $("#settings-btn").addEventListener("click", () => {
+    showPage("settings");
+  });
+
   $("#dashboard-location-btn").addEventListener("click", () => {
     Location.fromBrowser().then(loadPlace).catch(() => showError("Location unavailable."));
   });
@@ -611,6 +634,8 @@ function bindEvents() {
     link.addEventListener("click", (e) => {
       e.preventDefault();
       $$(".settings-nav .sn-link").forEach((l) => l.classList.toggle("is-active", l === link));
+      const target = $(`[data-sg="${link.dataset.sn}"]`);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
 

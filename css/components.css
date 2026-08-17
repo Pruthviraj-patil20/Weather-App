@@ -147,6 +147,39 @@
   color: var(--accent);
 }
 
+.card-location {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-tertiary);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  white-space: nowrap;
+  max-width: 45%;
+  overflow: hidden;
+}
+
+.card-location .loc-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-location svg {
+  width: 13px;
+  height: 13px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.ft-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
 /* ── Inputs ──────────────────────────────────────────────── */
 .input {
   width: 100%;

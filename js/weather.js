@@ -93,7 +93,7 @@ function formatDayLabel(ts, tzOffset, index) {
 /* ── Aggregate the free 5-day / 3-hour forecast ───────────── */
 function aggregateFromList(list, tzOffset, nowTs) {
   const hourly = list
-    .filter((item) => item.dt * 1000 >= nowTs - 3600 * 1000)
+    .filter((item) => item.dt >= nowTs - 3600)
     .slice(0, 24)
     .map((item) => ({
       ts: item.dt,
@@ -153,9 +153,9 @@ function aggregateFromList(list, tzOffset, nowTs) {
    from solar elevation (clear-sky model) damped by cloud cover.
    Enough to power a believable Low → Extreme indicator. */
 function estimateUV(current, lat) {
-  const { sunrise, sunset, dt, cloudiness, timezoneOffset } = current;
+  const { sunrise, sunset, dt, cloudiness } = current;
   if (!sunrise || !sunset) return 0;
-  const now = localTime(dt, timezoneOffset).getTime() / 1000;
+  const now = dt;
   if (now < sunrise || now > sunset) return 0;
 
   const solarNoon = (sunrise + sunset) / 2;
@@ -264,7 +264,20 @@ async function fetchAll(lat, lon) {
     current.timezoneOffset,
     Date.now() / 1000
   );
-  hourly = aggHourly;
+  hourly = [
+    {
+      ts: current.dt,
+      temp: current.temp,
+      weatherId: current.weatherId,
+      condition: current.condition,
+      iconKey: current.iconKey,
+      pop: aggHourly[0]?.pop ?? 0,
+      humidity: current.humidity,
+      windSpeed: current.windSpeed,
+      dt: current.dt,
+    },
+    ...aggHourly,
+  ].slice(0, 24);
   if (!extended) daily = aggDaily;
 
   const airQuality = await getAirQuality(lat, lon).catch(() => null);
