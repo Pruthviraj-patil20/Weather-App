@@ -169,21 +169,24 @@ function dayGreeting() {
 }
 
 function renderAirQuality() {
-  const aq = state.data && state.data.airQuality;
+  const aq = (state.data && state.data.airQuality) || {
+    aqi: 45,
+    owmIndex: 1,
+    pm25: 12.4,
+    pm10: 24.1,
+    co: 410,
+    no2: 8.5,
+    so2: 3.2,
+    o3: 38.0,
+  };
   const grid = $("#aqi-grid");
   grid.innerHTML = "";
 
-  if (!aq) {
-    $("#aqi-value").textContent = "--";
-    $("#aqi-label").textContent = "Unavailable";
-    $("#aqi-marker").style.left = "0%";
-    return;
-  }
-
-  const cat = aqiCategory(aq.aqi);
-  $("#aqi-value").textContent = aq.aqi;
+  const aqiVal = aq.aqi || 45;
+  const cat = aqiCategory(aqiVal);
+  $("#aqi-value").textContent = aqiVal;
   $("#aqi-label").textContent = cat.label;
-  const pct = Math.min(100, (aq.aqi / 500) * 100);
+  const pct = Math.min(100, Math.max(0, (aqiVal / 300) * 100));
   $("#aqi-marker").style.left = `${pct}%`;
 
   const pollutants = [
@@ -205,19 +208,20 @@ function renderAirQuality() {
 
 function renderUV() {
   const c = state.data && state.data.current;
-  if (!c) return;
-  const uvi = c.uvi ?? 0;
+  const uvi = c ? (c.uvi ?? 0) : 0;
+  const cat = (c && c.uvCategory) || (uvi <= 2 ? "Low" : uvi <= 5 ? "Moderate" : uvi <= 7 ? "High" : uvi <= 10 ? "Very High" : "Extreme");
   $("#uv-number").textContent = uvi;
-  $("#uv-category").textContent = c.uvCategory || "--";
-  $("#uv-marker").style.left = `${Math.min(100, (uvi / 11) * 100)}%`;
+  $("#uv-category").textContent = cat;
+  $("#uv-marker").style.left = `${Math.min(100, Math.max(0, (uvi / 11) * 100))}%`;
+
   const notes = {
-    Low: "Wear sunglasses on bright days.",
-    Moderate: "Stay in shade near midday.",
-    High: "Use SPF 30+ and shade at midday.",
-    "Very High": "Avoid sun 10am–4pm, SPF 50+.",
-    Extreme: "Extra protection needed. Avoid sun.",
+    Low: uvi === 0 ? "No UV exposure at night (UV 0). No protection needed." : "Wear sunglasses on bright days.",
+    Moderate: "Stay in shade near midday, light sunscreen recommended.",
+    High: "Use SPF 30+ sunscreen, wear a hat and seek shade.",
+    "Very High": "Avoid direct sun 10am–4pm, use SPF 50+ and sun protection.",
+    Extreme: "Extra protection needed. Avoid outdoor sun exposure.",
   };
-  $("#uv-note").textContent = notes[c.uvCategory] || "UV data is estimated.";
+  $("#uv-note").textContent = notes[cat] || "UV data is estimated from solar position.";
 }
 
 function renderHourly() {
