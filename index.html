@@ -184,11 +184,10 @@
                       <span>L: <strong id="low">--</strong></span>
                     </span>
                   </div>
-                  <div class="hero-updated" id="hero-updated-label">--</div>
-                <div class="hero-time-format" style="display:flex;gap:var(--space-2);font-size:var(--fs-sm);color:var(--text-tertiary);">
-                  <button class="time-option" data-time-format="12h">12h</button>
-                  <button class="time-option" data-time-format="24h">24h</button>
-                </div>
+                  <div class="hero-time-format">
+                    <button type="button" class="time-option" data-time-format="12h">12h</button>
+                    <button type="button" class="time-option" data-time-format="24h">24h</button>
+                  </div>
                 </div>
               </section>
 
@@ -520,6 +519,8 @@
   </div>
 
   <div id="overlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
 
   <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
     <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></symbol>

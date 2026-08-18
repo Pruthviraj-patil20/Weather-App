@@ -254,18 +254,21 @@ async function fetchAll(lat, lon, force = false) {
   let daily = [];
   let extended = false;
 
-  const extendedDaily = await getExtendedForecast(lat, lon);
-  if (extendedDaily && extendedDaily.length) {
-    daily = extendedDaily;
-    extended = true;
+  if (AppConfig.extendedForecast()) {
+    const extendedDaily = await getExtendedForecast(lat, lon).catch(() => null);
+    if (extendedDaily && extendedDaily.length) {
+      daily = extendedDaily;
+      extended = true;
+    }
   }
 
-  const raw = await getRawForecast(lat, lon);
+  const raw = await getRawForecast(lat, lon).catch(() => []);
   const { hourly: aggHourly, daily: aggDaily } = aggregateFromList(
-    raw,
+    raw || [],
     current.timezoneOffset,
     Date.now() / 1000
   );
+
   hourly = [
     {
       ts: current.dt,
@@ -278,12 +281,26 @@ async function fetchAll(lat, lon, force = false) {
       windSpeed: current.windSpeed,
       dt: current.dt,
     },
-    ...aggHourly,
+    ...(aggHourly || []),
   ].slice(0, 24);
-  if (!extended) daily = aggDaily;
+
+  if (!extended) {
+    daily = aggDaily && aggDaily.length ? aggDaily : [
+      {
+        dt: current.dt,
+        index: 0,
+        tempMin: current.tempMin,
+        tempMax: current.tempMax,
+        pop: 0,
+        humidity: current.humidity,
+        windSpeed: current.windSpeed,
+        weatherId: current.weatherId,
+        condition: current.condition,
+      },
+    ];
+  }
 
   const airQuality = await getAirQuality(lat, lon).catch(() => null);
-
   const uvi = estimateUV(current, lat);
 
   const result = {
@@ -297,6 +314,97 @@ async function fetchAll(lat, lon, force = false) {
 
   Storage.setCache(cacheKey, result);
   return result;
+}
+
+/* ── Demo / Offline fallback data generator ──────────────── */
+function generateFallbackData(cityName, lat = 18.5204, lon = 73.8567) {
+  const nowTs = Math.floor(Date.now() / 1000);
+  const tzOffset = 19800; // default IST offset
+
+  const hourly = [];
+  for (let i = 0; i < 24; i++) {
+    const ts = nowTs + i * 3600;
+    const hour = new Date((ts + tzOffset) * 1000).getUTCHours();
+    const isDay = hour >= 6 && hour < 19;
+    const temp = Math.round(25 + 4 * Math.sin(((hour - 4) / 24) * Math.PI * 2));
+    hourly.push({
+      ts,
+      temp,
+      weatherId: 801,
+      condition: "Partly Cloudy",
+      iconKey: isDay ? "partly-day" : "partly-night",
+      pop: 10,
+      humidity: 62,
+      windSpeed: 3.6,
+      dt: ts,
+    });
+  }
+
+  const daily = [];
+  for (let i = 0; i < 7; i++) {
+    const ts = nowTs + i * 86400;
+    daily.push({
+      dt: ts,
+      index: i,
+      tempMin: 22 + (i % 2),
+      tempMax: 29 + (i % 3),
+      pop: i === 2 || i === 4 ? 35 : 10,
+      humidity: 65,
+      windSpeed: 4.1,
+      weatherId: i === 2 ? 500 : 801,
+      condition: i === 2 ? "Light rain" : "Partly Cloudy",
+      iconKey: i === 2 ? "rain" : "partly-day",
+    });
+  }
+
+  const current = {
+    key: `${lat.toFixed(2)},${lon.toFixed(2)}`,
+    lat,
+    lon,
+    name: cityName || "Pune",
+    country: "IN",
+    dt: nowTs,
+    timezoneOffset: tzOffset,
+    temp: 26,
+    feelsLike: 27,
+    tempMin: 22,
+    tempMax: 30,
+    pressure: 1012,
+    humidity: 64,
+    windSpeed: 3.8,
+    windDeg: 240,
+    visibility: 10000,
+    cloudiness: 25,
+    precipitation: 0,
+    weatherId: 801,
+    condition: "Partly Cloudy",
+    iconKey: "partly-day",
+    sunrise: nowTs - 25000,
+    sunset: nowTs + 18000,
+    uvi: 5.4,
+    uvCategory: "Moderate",
+  };
+
+  const airQuality = {
+    aqi: 45,
+    owmIndex: 1,
+    pm25: 12.4,
+    pm10: 24.1,
+    co: 410,
+    no2: 8.5,
+    so2: 3.2,
+    o3: 38.0,
+  };
+
+  return {
+    current,
+    hourly,
+    daily,
+    airQuality,
+    extended: false,
+    fetchedAt: Date.now(),
+    isDemo: true,
+  };
 }
 
 export {
@@ -315,5 +423,6 @@ export {
   deriveScene,
   conditionLabel,
   fetchAll,
+  generateFallbackData,
   AQI_LEVELS,
 };

@@ -229,6 +229,40 @@
 }
 .hero-updated svg { width: 14px; height: 14px; }
 
+/* ── Hero time format toggle ─────────────────────────────── */
+.hero-time-format {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  padding: 3px;
+  border-radius: var(--radius-pill);
+}
+
+.hero-time-format .time-option {
+  padding: 3px 10px;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: all var(--t-fast);
+}
+
+.hero-time-format .time-option:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.hero-time-format .time-option.is-active {
+  background: #fff;
+  color: var(--accent-strong);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
 /* ── Stats grid ──────────────────────────────────────────── */
 .stats-grid {
   display: grid;

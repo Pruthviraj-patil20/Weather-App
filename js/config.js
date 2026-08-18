@@ -42,14 +42,12 @@ const AppConfig = {
     return (settings && settings.apiKey) || "";
   },
 
-  /** Enable extended daily forecast via One Call 3.0 (paid).
-      Attempted by default so paid keys get the full 7-day view;
-      free-tier keys fall back to the 5-day endpoint automatically. */
+  /** Enable extended daily forecast via One Call 3.0 (paid). */
   extendedForecast: function () {
     if (window.SKYCAST_CONFIG && typeof window.SKYCAST_CONFIG.WEATHER_API_EXTENDED !== "undefined") {
       return window.SKYCAST_CONFIG.WEATHER_API_EXTENDED === "1" || window.SKYCAST_CONFIG.WEATHER_API_EXTENDED === true;
     }
-    return true;
+    return false;
   },
 
   lang: function () {

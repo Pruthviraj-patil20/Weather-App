@@ -11,8 +11,9 @@
 
 /* ── Sidebar ─────────────────────────────────────────────── */
 .sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
   width: var(--sidebar-width);
   display: flex;
   flex-direction: column;
@@ -21,6 +22,7 @@
   padding: var(--space-6) var(--space-4);
   z-index: var(--z-sidebar);
   transition: transform var(--t-med), background-color var(--t-med);
+  overflow-y: auto;
 }
 
 .sidebar-brand {
@@ -274,17 +276,24 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(7, 11, 20, 0.5);
+  background: rgba(7, 11, 20, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: var(--z-overlay);
   opacity: 0;
   transition: opacity var(--t-med);
+  pointer-events: none;
 }
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 1023px) {
   .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    height: 100vh;
     transform: translateX(-100%);
     box-shadow: var(--shadow-lg);
+    z-index: var(--z-sidebar);
   }
 
   body.nav-open .sidebar {
@@ -294,6 +303,7 @@
   body.nav-open .sidebar-overlay {
     display: block;
     opacity: 1;
+    pointer-events: auto;
   }
 
   body.nav-open {
