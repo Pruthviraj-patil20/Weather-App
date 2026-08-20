@@ -113,42 +113,45 @@ function renderCurrent() {
   const name = c.name || place.name || "--";
   const country = c.country || place.country || "";
 
-  $("#hero-city-name").textContent = name;
-  $("#hero-country").textContent = country || "—";
+  if ($("#hero-city-name")) $("#hero-city-name").textContent = name;
+  if ($("#hero-country")) $("#hero-country").textContent = country || "—";
   if ($("#sidebar-location-name")) $("#sidebar-location-name").textContent = name;
   if ($("#pill-location-name")) $("#pill-location-name").textContent = name;
-  $("#greeting").textContent = `Good ${dayGreeting()}`;
+  if ($("#greeting")) $("#greeting").textContent = `Good ${dayGreeting()}`;
   const greetingEl = $("#greeting-location-name") || $("#location-country");
   if (greetingEl) greetingEl.textContent = `${name}${country ? ", " + country : ""}`;
-  $("#temperature").textContent = toDisplayTemp(c.temp);
-  $("#temp-unit").textContent = tempUnit();
-  $("#weather-description").textContent = conditionLabel(c.weatherId, c.condition);
-  $("#feels-like").textContent = `Feels like ${toDisplayTemp(c.feelsLike)}°${tempUnit().replace("°", "")}`;
-  setIcon($("#weather-icon"), c.iconKey);
+  if ($("#temperature")) $("#temperature").textContent = toDisplayTemp(c.temp);
+  if ($("#temp-unit")) $("#temp-unit").textContent = tempUnit();
+  if ($("#weather-description")) $("#weather-description").textContent = conditionLabel(c.weatherId, c.condition);
+  if ($("#feels-like")) $("#feels-like").textContent = `Feels like ${toDisplayTemp(c.feelsLike)}°${tempUnit().replace("°", "")}`;
+  if ($("#weather-icon")) setIcon($("#weather-icon"), c.iconKey);
 
-  $("#high").textContent = `${toDisplayTemp(c.tempMax)}°`;
-  $("#low").textContent = `${toDisplayTemp(c.tempMin)}°`;
+  if ($("#high")) $("#high").textContent = `${toDisplayTemp(c.tempMax)}°`;
+  if ($("#low")) $("#low").textContent = `${toDisplayTemp(c.tempMin)}°`;
 
-  $("#humidity").textContent = `${c.humidity}%`;
-  $("#wind").textContent = `${toDisplaySpeed(c.windSpeed)} ${speedUnit()}`;
-  $("#pressure").textContent = `${c.pressure} hPa`;
+  if ($("#humidity")) $("#humidity").textContent = `${c.humidity}%`;
+  if ($("#wind")) $("#wind").textContent = `${toDisplaySpeed(c.windSpeed)} ${speedUnit()}`;
+  if ($("#pressure")) $("#pressure").textContent = `${c.pressure} hPa`;
 
   const updated = new Date(data.fetchedAt);
   const s = Storage.getSettings();
   const timeFormat = s.timeFormat || "12h";
-  if (timeFormat === "24h") {
-    $("#hero-updated").textContent = `Updated ${updated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-  } else {
-    const h = updated.getHours();
-    const suffix = h >= 12 ? "PM" : "AM";
-    const hh = h % 12 === 0 ? 12 : h % 12;
-    $("#hero-updated").textContent = `Updated ${hh}:${updated.getMinutes().toString().padStart(2, "0")} ${suffix}`;
+  if ($("#hero-updated")) {
+    if (timeFormat === "24h") {
+      $("#hero-updated").textContent = `Updated ${updated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    } else {
+      const h = updated.getHours();
+      const suffix = h >= 12 ? "PM" : "AM";
+      const hh = h % 12 === 0 ? 12 : h % 12;
+      $("#hero-updated").textContent = `Updated ${hh}:${updated.getMinutes().toString().padStart(2, "0")} ${suffix}`;
+    }
   }
-  $("#hero-updated-label").textContent = `Live · ${conditionLabel(c.weatherId, c.condition)}`;
 
   const fav = Storage.isFavorite(c.key);
-  $("#favorite-btn").setAttribute("aria-pressed", String(fav));
-  $("#favorite-btn").classList.toggle("is-faved", fav);
+  if ($("#favorite-btn")) {
+    $("#favorite-btn").setAttribute("aria-pressed", String(fav));
+    $("#favorite-btn").classList.toggle("is-faved", fav);
+  }
 
   applyScene();
   renderLocations();
@@ -170,24 +173,37 @@ function dayGreeting() {
 
 function renderAirQuality() {
   const aq = (state.data && state.data.airQuality) || {
-    aqi: 45,
-    owmIndex: 1,
-    pm25: 12.4,
-    pm10: 24.1,
-    co: 410,
-    no2: 8.5,
-    so2: 3.2,
-    o3: 38.0,
+    aqi: 35,
+    pm25: 8.5,
+    pm10: 15.2,
+    co: 180,
+    no2: 4.2,
+    so2: 2.1,
+    o3: 42.0,
   };
   const grid = $("#aqi-grid");
+  if (!grid) return;
   grid.innerHTML = "";
 
-  const aqiVal = aq.aqi || 45;
+  const aqiVal = aq.aqi != null ? Math.round(aq.aqi) : 35;
   const cat = aqiCategory(aqiVal);
-  $("#aqi-value").textContent = aqiVal;
-  $("#aqi-label").textContent = cat.label;
-  const pct = Math.min(100, Math.max(0, (aqiVal / 300) * 100));
-  $("#aqi-marker").style.left = `${pct}%`;
+
+  const valEl = $("#aqi-value");
+  const labelEl = $("#aqi-label");
+  const markerEl = $("#aqi-marker");
+
+  if (valEl) {
+    valEl.textContent = aqiVal;
+    valEl.style.color = cat.color;
+  }
+  if (labelEl) {
+    labelEl.textContent = cat.label;
+    labelEl.style.color = cat.color;
+  }
+  if (markerEl) {
+    const pct = Math.min(100, Math.max(0, (aqiVal / 300) * 100));
+    markerEl.style.left = `${pct}%`;
+  }
 
   const pollutants = [
     ["PM2.5", aq.pm25, "µg/m³"],
@@ -201,40 +217,69 @@ function renderAirQuality() {
   pollutants.forEach(([label, value, unit]) => {
     const item = el("div", "aqi-item");
     item.appendChild(el("span", "aqi-item-name", label));
-    item.appendChild(el("span", "aqi-item-value", `${value ?? "--"} ${unit}`));
+    const valText = value != null && !isNaN(value) ? `${value} ${unit}` : `-- ${unit}`;
+    item.appendChild(el("span", "aqi-item-value", valText));
     grid.appendChild(item);
   });
 }
 
 function renderUV() {
   const c = state.data && state.data.current;
-  const uvi = c ? (c.uvi ?? 0) : 0;
+  const uvi = c ? (typeof c.uvi === "number" ? c.uvi : 0) : 0;
   const cat = (c && c.uvCategory) || (uvi <= 2 ? "Low" : uvi <= 5 ? "Moderate" : uvi <= 7 ? "High" : uvi <= 10 ? "Very High" : "Extreme");
-  $("#uv-number").textContent = uvi;
-  $("#uv-category").textContent = cat;
-  $("#uv-marker").style.left = `${Math.min(100, Math.max(0, (uvi / 11) * 100))}%`;
+
+  const uvColors = {
+    Low: "var(--uv-low)",
+    Moderate: "var(--uv-moderate)",
+    High: "var(--uv-high)",
+    "Very High": "var(--uv-very-high)",
+    Extreme: "var(--uv-extreme)",
+  };
+  const color = uvColors[cat] || "var(--uv-low)";
+
+  const uvNumEl = $("#uv-number");
+  const uvCatEl = $("#uv-category");
+  const uvMarkerEl = $("#uv-marker");
+  const uvNoteEl = $("#uv-note");
+
+  if (uvNumEl) {
+    uvNumEl.textContent = uvi;
+    uvNumEl.style.color = color;
+  }
+  if (uvCatEl) {
+    uvCatEl.textContent = cat;
+    uvCatEl.style.color = color;
+  }
+  if (uvMarkerEl) {
+    uvMarkerEl.style.left = `${Math.min(100, Math.max(0, (uvi / 11) * 100))}%`;
+  }
 
   const notes = {
-    Low: uvi === 0 ? "No UV exposure at night (UV 0). No protection needed." : "Wear sunglasses on bright days.",
-    Moderate: "Stay in shade near midday, light sunscreen recommended.",
-    High: "Use SPF 30+ sunscreen, wear a hat and seek shade.",
-    "Very High": "Avoid direct sun 10am–4pm, use SPF 50+ and sun protection.",
-    Extreme: "Extra protection needed. Avoid outdoor sun exposure.",
+    Low: uvi === 0
+      ? "No UV exposure at night (UV 0). No sun protection needed."
+      : "Low risk: Minimal sun protection required. Wear sunglasses on bright days.",
+    Moderate: "Moderate risk: Seek shade near midday, apply SPF 30+ and wear a hat.",
+    High: "High risk: Reduce sun exposure between 10am–4pm. Use SPF 30+, hat, and sunglasses.",
+    "Very High": "Very high risk: Take extra precautions. Unprotected skin can burn quickly. Use SPF 50+.",
+    Extreme: "Extreme risk: Take all precautions. Avoid sun exposure during peak daylight hours.",
   };
-  $("#uv-note").textContent = notes[cat] || "UV data is estimated from solar position.";
+  if (uvNoteEl) {
+    uvNoteEl.textContent = notes[cat] || "UV Index is based on live atmospheric measurements.";
+  }
 }
 
 function renderHourly() {
   const { data } = state;
   const strip = $("#hourly-strip");
+  if (!strip) return;
   strip.innerHTML = "";
 
-  if (!data) {
+  if (!data || !data.hourly || !data.hourly.length) {
     strip.appendChild(el("p", "empty-note", "Hourly data unavailable."));
     return;
   }
 
-  const tz = data.current.timezoneOffset;
+  const tz = data.current?.timezoneOffset || 0;
   const nowTs = Date.now() / 1000;
 
   data.hourly.slice(0, 12).forEach((h, i) => {
@@ -255,14 +300,15 @@ function renderHourly() {
 function renderWeekly() {
   const { data } = state;
   const list = $("#weekly-list");
+  if (!list) return;
   list.innerHTML = "";
 
-  if (!data) {
+  if (!data || !data.daily || !data.daily.length) {
     list.appendChild(el("p", "empty-note", "Forecast unavailable."));
     return;
   }
 
-  const tz = data.current.timezoneOffset;
+  const tz = data.current?.timezoneOffset || 0;
 
   data.daily.slice(0, 7).forEach((d, i) => {
     const row = el("div", "weather-row");
@@ -286,47 +332,51 @@ function renderForecastPage() {
   const { data } = state;
   if (!data) return;
 
-  const tz = data.current.timezoneOffset;
+  const tz = data.current?.timezoneOffset || 0;
   const nowTs = Date.now() / 1000;
 
   const hourly = $("#forecast-hourly");
-  hourly.innerHTML = "";
-  data.hourly.forEach((h, i) => {
-    const cell = el("div", "hour24-cell");
-    if (i === 0) cell.classList.add("is-now");
-    cell.appendChild(el("span", "h24-time", formatHourLabel(h.dt, tz, nowTs)));
-    const iconBox = el("div", "h24-icon");
-    setIcon(iconBox, h.iconKey);
-    cell.appendChild(iconBox);
-    cell.appendChild(el("span", "h24-temp", `${toDisplayTemp(h.temp)}°`));
-    const rain = el("span", "h24-rain");
-    rain.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6v6M12 6v6M16 6v6"/></svg> ${h.pop}%`;
-    cell.appendChild(rain);
-    hourly.appendChild(cell);
-  });
+  if (hourly) {
+    hourly.innerHTML = "";
+    (data.hourly || []).forEach((h, i) => {
+      const cell = el("div", "hour24-cell");
+      if (i === 0) cell.classList.add("is-now");
+      cell.appendChild(el("span", "h24-time", formatHourLabel(h.dt, tz, nowTs)));
+      const iconBox = el("div", "h24-icon");
+      setIcon(iconBox, h.iconKey);
+      cell.appendChild(iconBox);
+      cell.appendChild(el("span", "h24-temp", `${toDisplayTemp(h.temp)}°`));
+      const rain = el("span", "h24-rain");
+      rain.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6v6M12 6v6M16 6v6"/></svg> ${h.pop}%`;
+      cell.appendChild(rain);
+      hourly.appendChild(cell);
+    });
+  }
 
   const daily = $("#forecast-daily");
-  daily.innerHTML = "";
-  data.daily.forEach((d, i) => {
-    const row = el("div", "daily-card-row");
-    const dayCol = el("div");
-    dayCol.appendChild(el("div", "dc-day", formatDayLabel(d.dt, tz, i)));
-    const dateStr = new Date(d.dt * 1000).toLocaleDateString([], { month: "short", day: "numeric" });
-    dayCol.appendChild(el("div", "dc-date", dateStr));
-    row.appendChild(dayCol);
-    const iconBox = el("div", "dc-icon");
-    setIcon(iconBox, d.iconKey);
-    row.appendChild(iconBox);
-    row.appendChild(el("div", "dc-cond", conditionLabel(d.weatherId, d.condition)));
-    const rain = el("span", "dc-rain");
-    rain.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6v6M12 6v6M16 6v6"/></svg> ${d.pop ?? 0}%`;
-    row.appendChild(rain);
-    const temps = el("div", "dc-temps");
-    temps.appendChild(el("span", "dc-high", `${toDisplayTemp(d.tempMax)}°`));
-    temps.appendChild(el("span", "dc-low", `${toDisplayTemp(d.tempMin)}°`));
-    row.appendChild(temps);
-    daily.appendChild(row);
-  });
+  if (daily) {
+    daily.innerHTML = "";
+    (data.daily || []).forEach((d, i) => {
+      const row = el("div", "daily-card-row");
+      const dayCol = el("div");
+      dayCol.appendChild(el("div", "dc-day", formatDayLabel(d.dt, tz, i)));
+      const dateStr = new Date(d.dt * 1000).toLocaleDateString([], { month: "short", day: "numeric" });
+      dayCol.appendChild(el("div", "dc-date", dateStr));
+      row.appendChild(dayCol);
+      const iconBox = el("div", "dc-icon");
+      setIcon(iconBox, d.iconKey);
+      row.appendChild(iconBox);
+      row.appendChild(el("div", "dc-cond", conditionLabel(d.weatherId, d.condition)));
+      const rain = el("span", "dc-rain");
+      rain.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6v6M12 6v6M16 6v6"/></svg> ${d.pop ?? 0}%`;
+      row.appendChild(rain);
+      const temps = el("div", "dc-temps");
+      temps.appendChild(el("span", "dc-high", `${toDisplayTemp(d.tempMax)}°`));
+      temps.appendChild(el("span", "dc-low", `${toDisplayTemp(d.tempMin)}°`));
+      row.appendChild(temps);
+      daily.appendChild(row);
+    });
+  }
 }
 
 function renderDetails() {
@@ -335,7 +385,13 @@ function renderDetails() {
   grid.innerHTML = "";
   if (!c) return;
 
+  const aq = state.data && state.data.airQuality;
+  const aqiVal = aq && aq.aqi != null ? Math.round(aq.aqi) : null;
+  const aqiCat = aqiVal != null ? aqiCategory(aqiVal).label : "--";
+
   const details = [
+    ["UV Index", `${c.uvi ?? 0} (${c.uvCategory || "Low"})`, "Sun exposure risk"],
+    ["Air Quality", aqiVal != null ? `${aqiVal} AQI (${aqiCat})` : "--", "US EPA Air Index"],
     ["Humidity", `${c.humidity}%`, "Relative air moisture"],
     ["Wind", `${toDisplaySpeed(c.windSpeed)} ${speedUnit()}`, windCardinal(c.windDeg)],
     ["Pressure", `${c.pressure} hPa`, "Sea-level pressure"],
@@ -572,13 +628,13 @@ function renderSettings() {
     btn.classList.toggle("is-active", btn.dataset.unit === (s.units || "metric"));
   });
 
-  $("#wind-speed-select").value = s.windSpeed || "auto";
-  $("#time-format-select").value = s.timeFormat || "12h";
+  if ($("#wind-speed-select")) $("#wind-speed-select").value = s.windSpeed || "auto";
+  if ($("#time-format-select")) $("#time-format-select").value = s.timeFormat || "12h";
   $$(".hero-time-format .time-option").forEach((opt) => {
     opt.classList.toggle("is-active", opt.dataset.timeFormat === (s.timeFormat || "12h"));
   });
-  $("#geolocation-toggle").checked = s.useGeolocation !== false;
-  $("#api-key-input").value = AppConfig.apiKey() || "";
+  if ($("#geolocation-toggle")) $("#geolocation-toggle").checked = s.useGeolocation !== false;
+  if ($("#api-key-input")) $("#api-key-input").value = AppConfig.apiKey() || "";
 }
 
 /* ── Initialisation ───────────────────────────────────────── */

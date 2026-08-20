@@ -10,6 +10,8 @@ import {
   getRawForecast,
   getExtendedForecast,
   getAirQuality,
+  getLiveUV,
+  calculateEpaAqi,
   normalizeDaily,
   mapIcon,
 } from "./api.js";
@@ -272,7 +274,9 @@ async function fetchAll(lat, lon, force = false) {
   const cacheKey = `${lat.toFixed(2)},${lon.toFixed(2)}`;
   if (!force) {
     const cached = Storage.getCache(cacheKey);
-    if (cached) return cached;
+    if (cached && cached.airQuality && typeof cached.current?.uvi === "number" && cached.hourly?.length) {
+      return cached;
+    }
   }
 
   const current = await getCurrentWeather(lat, lon);
@@ -327,12 +331,25 @@ async function fetchAll(lat, lon, force = false) {
     ];
   }
 
-  let airQuality = await getAirQuality(lat, lon).catch(() => null);
+  // Fetch Air Quality and Live UV in parallel
+  const [airQualityRes, liveUvi] = await Promise.all([
+    getAirQuality(lat, lon).catch(() => null),
+    getLiveUV(lat, lon).catch(() => null),
+  ]);
+
+  let airQuality = airQualityRes;
   if (!airQuality) {
     airQuality = estimateAQI(current, lat, lon);
   }
 
-  const uvi = estimateUV(current, lat);
+  // Use live UV from Open-Meteo, or fallback to solar model
+  const resolvedUvi = typeof liveUvi === "number"
+    ? liveUvi
+    : (airQuality && typeof airQuality.uvi === "number")
+      ? airQuality.uvi
+      : estimateUV(current, lat);
+
+  const uvi = Math.max(0, Math.round(resolvedUvi * 10) / 10);
 
   const result = {
     current: { ...current, uvi, uvCategory: uvCategory(uvi) },
